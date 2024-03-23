@@ -549,8 +549,10 @@ class fighterEnv(Env):
         reward+=self.playerHP-prePlayerHealth
         reward+=self.enemyHP-preEnemyHealth
         
-        if (self.enemyStun):reward+=10;
-        if (self.playerStun):reward-=10;
+        if (done):
+            if (self.playerHP>self.enemyHP):reward+=100;
+            else: reward-=100;
+
         reward-=1;
         
         return self.state, reward, done, info
