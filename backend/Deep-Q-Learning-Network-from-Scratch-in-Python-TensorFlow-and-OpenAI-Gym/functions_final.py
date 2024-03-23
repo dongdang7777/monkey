@@ -158,6 +158,7 @@ class DeepQLearning:
         # Calculate mean squared error between the gathered elements
         loss = tf.losses.mean_squared_error(gathered_true, gathered_pred)
 
+        print(loss);
         return loss
     ###########################################################################
     #   END - of function my_loss_fn
