@@ -10,8 +10,8 @@ from Game.gameSettings import HP, LEFTBORDER, RIGHTBORDER, LEFTSTART, RIGHTSTART
 # SECONDARY CAN BE : Hadoken, Grenade, Boomerang, Bear Trap
 
 # TODO FOR PARTICIPANT: Set primary and secondary skill here
-PRIMARY_SKILL = Meditate
-SECONDARY_SKILL = SuperSaiyanSkill
+PRIMARY_SKILL = DashAttackSkill
+SECONDARY_SKILL = Hadoken
 
 #constants, for easier move return
 #movements

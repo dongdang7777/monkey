@@ -30,31 +30,37 @@ gym==0.26.2
 
 """
 # import the class
-import numpy as np
 import tensorflow as tf
 from env import fighterEnv
 from functions_final import DeepQLearning
+import os
 # classical gym 
+import numpy as np
 import gym
 # instead of gym, import gymnasium 
 #import gymnasium as gym
 
-# create environment
-env=fighterEnv();
+env=fighterEnv()
 input_shape=20
 num_actions=11
+policy_network=None
 
-policy_network = tf.keras.models.Sequential([
-    tf.keras.layers.Dense(32, activation='relu', input_shape=(input_shape,)),
-    tf.keras.layers.Dense(32, activation='relu'),
-    tf.keras.layers.Dense(num_actions, activation='softmax')
-])
-
+if (os.path.isfile("trained_model_temp.keras")):
+    policy_network=tf.keras.models.load_model("trained_model_temp.keras");
+# create environment
+else:
+    policy_network = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(32, activation='relu', input_shape=(input_shape,)),
+        tf.keras.layers.Dense(64, activation='relu'),
+        tf.keras.layers.Dense(64, activation='relu'),
+        tf.keras.layers.Dense(64, activation='relu'),
+        tf.keras.layers.Dense(num_actions, activation='softmax')
+    ])
 
 # Set up the optimizer and loss function
 optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
 loss_fn = tf.keras.losses.SparseCategoricalCrossentropy()
-# select the parameters
+
 
 # Set up lists to store episode rewards and lengths
 episode_rewards = []
@@ -64,6 +70,9 @@ num_episodes = 1000
 discount_factor = 0.99
 
 # Train the agent using the REINFORCE algorithm
+epsilon=1
+epsilon_min=0.5;
+epsilon_decay=0.99;
 for episode in range(num_episodes):
     # Reset the environment and get the initial state
     state = env.reset()
@@ -78,12 +87,17 @@ for episode in range(num_episodes):
     # Run the episode
     while True:
         # Get the action probabilities from the policy network
-        print(np.array())
-        action_probs = policy_network.predict(np.array([state]))[0]
         
-        # Choose an action based on the action probabilities
-        action = np.random.choice(num_actions, p=action_probs)
+        action_probs = policy_network.predict(state.reshape(1,input_shape))[0]
 
+        # Choose an action based on the action probabilities
+        epsilon = max(epsilon_min, epsilon * epsilon_decay)
+        if np.random.rand() <= epsilon:
+            print("----------------------------------------------------")
+            action = np.random.choice(num_actions)
+        else:
+            action = np.argmax(policy_network.predict(state.reshape(1, input_shape))[0])
+    
         # Take the chosen action and observe the next state and reward
         next_state, reward, done, _ = env.step(action)
 
@@ -108,9 +122,10 @@ for episode in range(num_episodes):
     for i in reversed(range(len(rewards))):
         running_total = running_total * discount_factor + rewards[i]
         discounted_rewards[i] = running_total
-
+    
     # Normalize the discounted rewards
-    discounted_rewards -= np.mean(discounted_rewards)
+    discounted_rewards = discounted_rewards - np.mean(discounted_rewards).astype(discounted_rewards.dtype)
+    discounted_rewards = discounted_rewards.astype('float64')
     discounted_rewards /= np.std(discounted_rewards)
 
     # Convert the lists of states, actions, and discounted rewards to tensors
@@ -137,13 +152,7 @@ for episode in range(num_episodes):
     episode_lengths.append(episode_length)
     
     policy_network.save('trained_model_temp.keras')
-# number of training episodes
-# NOTE HERE THAT AFTER CERTAIN NUMBERS OF EPISODES, WHEN THE PARAMTERS ARE LEARNED
-# THE EPISODE WILL BE LONG, AT THAT POINT YOU CAN STOP THE TRAINING PROCESS BY PRESSING CTRL+C
-policy_network.summary()
-# save the model, this is important, since it takes long time to train the model 
-# and we will need model in another file to visualize the trained model performance
-policy_network.save("trained_model_temp.keras")
+# select the parameters
 
 
 

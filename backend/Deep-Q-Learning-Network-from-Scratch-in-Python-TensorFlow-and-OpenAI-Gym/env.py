@@ -310,8 +310,8 @@ def get_nearest_projectile(player, projectiles):
 # if __name__ == "__main__":
 class fighterEnv(Env):
     def __init__(self):
-        PRIMARY_SKILL = Meditate
-        SECONDARY_SKILL = SuperSaiyanSkill
+        PRIMARY_SKILL = DashAttackSkill
+        SECONDARY_SKILL = Hadoken
         JUMP = ("move", (0,1))
         FORWARD = ("move", (1,0))
         BACK = ("move", (-1,0))
@@ -592,7 +592,7 @@ class fighterEnv(Env):
             self.projY
         ]
         self.state=np.array(self.state);
-        a=(self.playerHP-prePlayerHealth)*2;
+        a=(self.playerHP-prePlayerHealth)*3;
         b=max(0,(preEnemyHealth-self.enemyHP)*2)
         reward+=a;
         reward+=b
@@ -734,7 +734,7 @@ class fighterEnv(Env):
             self.projY
         ]
         self.state=np.array(self.state);
-        return self.state,5
+        return self.state
 
 if __name__=="__main__":
     env=fighterEnv();
