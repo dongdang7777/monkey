@@ -70,9 +70,6 @@ num_episodes = 1000
 discount_factor = 0.99
 
 # Train the agent using the REINFORCE algorithm
-epsilon=1
-epsilon_min=0.5;
-epsilon_decay=0.99;
 for episode in range(num_episodes):
     # Reset the environment and get the initial state
     state = env.reset()
@@ -83,6 +80,10 @@ for episode in range(num_episodes):
     states = []
     actions = []
     rewards = []
+    
+    epsilon=1
+    epsilon_min=0.1;
+    epsilon_decay=0.99;
 
     # Run the episode
     while True:
