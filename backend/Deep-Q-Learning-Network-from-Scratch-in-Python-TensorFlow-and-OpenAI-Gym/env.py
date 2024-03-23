@@ -296,8 +296,8 @@ def get_empty_json():
 # if __name__ == "__main__":
 class fighterEnv(Env):
     def __init__(self):
-        PRIMARY_SKILL = TeleportSkill
-        SECONDARY_SKILL = Hadoken
+        PRIMARY_SKILL = Meditate
+        SECONDARY_SKILL = SuperSaiyanSkill
         JUMP = ("move", (0,1))
         FORWARD = ("move", (1,0))
         BACK = ("move", (-1,0))
