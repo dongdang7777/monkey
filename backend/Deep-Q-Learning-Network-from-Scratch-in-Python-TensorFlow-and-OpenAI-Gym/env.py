@@ -554,7 +554,9 @@ class fighterEnv(Env):
             else: reward-=100;
 
         reward-=1;
-        
+        print(self.playerHP)
+        print(self.enemyHP)
+        print(realAction);
         return self.state, reward, done, info
 
     def render(self):
@@ -562,21 +564,6 @@ class fighterEnv(Env):
     
     
     def reset(self):
-        PRIMARY_SKILL = TeleportSkill
-        SECONDARY_SKILL = Hadoken
-        JUMP = ("move", (0,1))
-        FORWARD = ("move", (1,0))
-        BACK = ("move", (-1,0))
-        JUMP_FORWARD = ("move", (1,1))
-        JUMP_BACKWARD = ("move", (-1, 1))
-        LIGHT = ("light",)
-        HEAVY = ("heavy",)
-        BLOCK = ("block",)
-        PRIMARY = get_skill(PRIMARY_SKILL)
-        SECONDARY = get_skill(SECONDARY_SKILL)
-        CANCEL = ("skill_cancel", )
-        NOMOVE = "NoMove"
-        self.Actions=[PRIMARY,SECONDARY,JUMP,FORWARD,BACK,JUMP_FORWARD,JUMP_BACKWARD,LIGHT,HEAVY,BLOCK,CANCEL,NOMOVE]
         self.path1=PATH1;
         self.path2=PATH2;
         self.projectiles=[];
@@ -680,3 +667,18 @@ class fighterEnv(Env):
         ] 
         self.state=np.array(self.state);
         return self.state,5
+
+if __name__=="__main__":
+    env=fighterEnv();
+    episodes = 10
+    for episode in range(1, episodes+1):
+        state = env.reset()
+        done = False
+        score = 0 
+        
+        while not done:
+            #env.render()
+            action = env.action_space.sample()
+            n_state, reward, done, info = env.step(action)
+            score+=reward
+        print('Episode:{} Score:{}'.format(episode, score))
