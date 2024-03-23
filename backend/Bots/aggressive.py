@@ -11,7 +11,7 @@ from Game.gameSettings import HP, LEFTBORDER, RIGHTBORDER, LEFTSTART, RIGHTSTART
 
 # TODO FOR PARTICIPANT: Set primary and secondary skill here
 PRIMARY_SKILL = OnePunchSkill
-SECONDARY_SKILL = SuperSaiyanSkill
+SECONDARY_SKILL = Hadoken
 
 #constants, for easier move return
 #movements

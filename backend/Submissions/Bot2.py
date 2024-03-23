@@ -10,8 +10,8 @@ from Game.gameSettings import HP, LEFTBORDER, RIGHTBORDER, LEFTSTART, RIGHTSTART
 # SECONDARY CAN BE : Hadoken, Grenade, Boomerang, Bear Trap
 
 # TODO FOR PARTICIPANT: Set primary and secondary skill here
-PRIMARY_SKILL = DashAttackSkill
-SECONDARY_SKILL = Grenade
+PRIMARY_SKILL = OnePunchSkill
+SECONDARY_SKILL = Hadoken
 
 #constants, for easier move return
 #movements
@@ -28,6 +28,7 @@ BLOCK = ("block",)
 
 PRIMARY = get_skill(PRIMARY_SKILL)
 SECONDARY = get_skill(SECONDARY_SKILL)
+CANCEL = ("skill_cancel", )
 
 # no move, aka no input
 NOMOVE = "NoMove"
@@ -47,31 +48,15 @@ class Script:
     
     # MAIN FUNCTION that returns a single move to the game manager
     def get_move(self, player, enemy, player_projectiles, enemy_projectiles):
-        distance = abs(get_pos(player)[0] - get_pos(enemy)[0])
-        if len(enemy_projectiles) > 0: 
-            first_proj_pos = get_proj_pos(enemy_projectiles[0])
-            proj_distance = abs(get_pos(player)[0] - first_proj_pos[0])
-            if proj_distance < 3:
-                if not primary_on_cooldown(player):
-                    return PRIMARY
-                return BLOCK
-           
-        if not secondary_on_cooldown(player):
-            return SECONDARY
-        if not primary_on_cooldown(player) and distance < prim_range(player):
-            return PRIMARY
-        
-        if distance == 1:
+        player_x, player_y = get_pos(player)
+        enemy_x, enemy_y = get_pos(enemy)
+        if player_y == enemy_y and abs(player_x - enemy_x) == 1:
+            if not primary_on_cooldown(player):
+                return PRIMARY
+            if not secondary_on_cooldown(player):
+                return SECONDARY
             if not heavy_on_cooldown(player):
                 return HEAVY
-            
             return LIGHT
-        
-        if get_hp(player) <= get_hp(enemy):
+        else:
             return FORWARD
-        
-        if distance > prim_range(player) - 1:
-            return FORWARD
-        elif  distance == prim_range(player):
-            return NOMOVE
-        return BACK
