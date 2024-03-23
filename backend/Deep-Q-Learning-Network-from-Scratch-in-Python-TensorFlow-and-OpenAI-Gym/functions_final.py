@@ -29,6 +29,7 @@ gym==0.26.2
 
 """
 # import the necessary libraries
+import os
 import numpy as np
 import random
 import tensorflow as tf
@@ -139,6 +140,7 @@ class DeepQLearning:
     #     loss = mean_squared_error(gather_nd(y_true,indices=indices.astype(int)), gather_nd(y_pred,indices=indices.astype(int)))
     #     #print(loss)
     #     return loss    
+    
     def my_loss_fn(self, y_true, y_pred):
         
         s1, s2 = y_true.shape
@@ -169,11 +171,14 @@ class DeepQLearning:
     
     # create a neural network
     def createNetwork(self):
-        model=Sequential()
-        model.add(Dense(128,input_dim=self.stateDimension,activation='relu'))
-        model.add(Dense(56,activation='relu'))
-        model.add(Dense(self.actionDimension,activation='linear'))
-        # compile the network with the custom loss defined in my_loss_fn
+        if (os.path.isfile("trained_model_temp.keras")):
+            model=tf.keras.models.load_model("trained_model_temp.keras",compile=False)
+            print("Loaded")
+        else:
+            model=Sequential()
+            model.add(Dense(128,input_dim=self.stateDimension,activation='relu'))
+            model.add(Dense(56,activation='relu'))
+            model.add(Dense(self.actionDimension,activation='linear'))
         model.compile(optimizer = RMSprop(), loss = self.my_loss_fn, metrics = ['accuracy'])
         return model
     ###########################################################################

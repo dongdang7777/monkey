@@ -14,6 +14,7 @@ from Game.turnUpdates import *
 from Game.PlayerConfigs import Player_Controller
 from ScriptingHelp.usefulFunctions import *
 from gym.spaces import Discrete
+from math import sqrt
 # Manually choose bot files to test
 SUBMISSIONPATH = "Submissions"
 PATH1 = "Bot1"
@@ -608,8 +609,10 @@ class fighterEnv(Env):
         if (b>0):
             print("Rewarded for damaging")
 
-        print("Player HP:",self.playerHP)
-        print("Enemy HP:", self.enemyHP)
+        print("Player's health",self.playerHP);
+        print("Enemy's health",self.enemyHP);
+        reward+=self.enemyStun*2;
+        reward-=self.playerStun*2;
         print(realAction);
         return self.state, reward, done, info
 

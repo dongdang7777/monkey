@@ -30,6 +30,7 @@ gym==0.26.2
 
 """
 # import the class
+import tensorflow as tf
 from env import fighterEnv
 from functions_final import DeepQLearning
 # classical gym 
@@ -47,8 +48,7 @@ epsilon=0.1
 # NOTE HERE THAT AFTER CERTAIN NUMBERS OF EPISODES, WHEN THE PARAMTERS ARE LEARNED
 # THE EPISODE WILL BE LONG, AT THAT POINT YOU CAN STOP THE TRAINING PROCESS BY PRESSING CTRL+C
 # DO NOT WORRY, THE PARAMETERS WILL BE MEMORIZED
-numberEpisodes=1000
-
+numberEpisodes=10
 # create an object
 LearningQDeep=DeepQLearning(env,gamma,epsilon,numberEpisodes)
 # run the learning process
@@ -60,7 +60,7 @@ LearningQDeep.sumRewardsEpisode
 LearningQDeep.mainNetwork.summary()
 # save the model, this is important, since it takes long time to train the model 
 # and we will need model in another file to visualize the trained model performance
-LearningQDeep.mainNetwork.save("trained_model_temp.h5")
+LearningQDeep.mainNetwork.save("trained_model_temp.keras")
 
 
 

@@ -42,7 +42,7 @@ import gym
 import numpy as np
 
 # load the model
-loaded_model = keras.models.load_model("trained_model.h5",custom_objects={'my_loss_fn':DeepQLearning.my_loss_fn})
+loaded_model = keras.models.load_model("trained_model_temp.keras",custom_objects={'my_loss_fn':DeepQLearning.my_loss_fn})
 
 
 sumObtainedRewards=0
