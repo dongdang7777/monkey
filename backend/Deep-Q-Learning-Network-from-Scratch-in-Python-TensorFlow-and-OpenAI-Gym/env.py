@@ -561,8 +561,8 @@ class fighterEnv(Env):
         
 
         proj=get_nearest_projectile(self.player1,self.p2_projectiles);
-        self.projX=-999
-        self.projY=-999
+        self.projX=-1
+        self.projY=-1
         if (proj!=None):
                 self.projX,self.projY=get_proj_pos(proj)
                 print("Projectile spawned ",self.projX,self.projY);
@@ -701,8 +701,8 @@ class fighterEnv(Env):
         
 
         proj=get_nearest_projectile(self.player1,self.p2_projectiles);
-        self.projX=-999
-        self.projY=-999
+        self.projX=-1
+        self.projY=-1
         if (proj!=None):
                 self.projX,self.projY=get_proj_pos(proj)
                 print("Projectile spawned ",self.projX,self.projY);
