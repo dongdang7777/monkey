@@ -308,9 +308,8 @@ class fighterEnv(Env):
         BLOCK = ("block",)
         PRIMARY = get_skill(PRIMARY_SKILL)
         SECONDARY = get_skill(SECONDARY_SKILL)
-        CANCEL = ("skill_cancel", )
         NOMOVE = "NoMove"
-        self.Actions=[PRIMARY,SECONDARY,JUMP,FORWARD,BACK,JUMP_FORWARD,JUMP_BACKWARD,LIGHT,HEAVY,BLOCK,CANCEL,NOMOVE]
+        self.Actions=[PRIMARY,SECONDARY,JUMP,FORWARD,BACK,JUMP_FORWARD,JUMP_BACKWARD,LIGHT,HEAVY,BLOCK,NOMOVE]
         
         self.path1=PATH1;
         self.path2=PATH2;
@@ -381,7 +380,7 @@ class fighterEnv(Env):
         # Secondary
         
 
-        self.action_space = Discrete(12)
+        self.action_space = Discrete(11)
         # Temperature y
 
         #Player x
