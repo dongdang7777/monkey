@@ -62,7 +62,7 @@ class DeepQLearning:
         self.numberEpisodes=numberEpisodes
         
         # state dimension
-        self.stateDimension=18
+        self.stateDimension=20
         # action dimension
         self.actionDimension=11
         # this is the maximum size of the replay buffer

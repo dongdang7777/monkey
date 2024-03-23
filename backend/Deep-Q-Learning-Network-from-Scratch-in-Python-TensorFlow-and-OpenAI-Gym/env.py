@@ -291,7 +291,20 @@ def get_empty_json():
     
         
     # Write into json files
-    
+def get_nearest_projectile(player, projectiles):
+    nearest_projectile = None
+    nearest_distance = float('inf')
+
+    for proj in projectiles:
+        player_x, player_y = get_pos(player)
+        proj_x, proj_y = get_proj_pos(proj)
+        distance = sqrt((player_x - proj_x)**2 + (player_y - proj_y)**2)
+        if distance < nearest_distance:
+            nearest_distance = distance
+            nearest_projectile = proj
+
+    return nearest_projectile
+
 # Allows to run directly from GameManager to simulate single rounds
 # if __name__ == "__main__":
 class fighterEnv(Env):
@@ -393,11 +406,11 @@ class fighterEnv(Env):
         self.playerHP=get_hp(self.player1)
         self.enemyHP=get_hp(self.player2)
     
-        # self.p1_projectiles = [proj["projectile"] for proj in self.projectiles if proj["projectile"]._player._id == 1]
-        # self.p2_projectiles = [proj["projectile"] for proj in self.projectiles if proj["projectile"]._player._id == 2]
+        self.p1_projectiles = [proj["projectile"] for proj in self.projectiles if proj["projectile"]._player._id == 1]
+        self.p2_projectiles = [proj["projectile"] for proj in self.projectiles if proj["projectile"]._player._id == 2]
         self.playerX,self.playerY=get_pos(self.player1);
         self.enemyX,self.enemyY=get_pos(self.player2);
-
+        
         self.playerStun=get_stun_duration(self.player1);
         self.enemyStun=get_stun_duration(self.player2);
 
@@ -419,6 +432,17 @@ class fighterEnv(Env):
         if (self.playerHeavy==True):self.playerHeavy=1;
         else: self.playerHeavy=0
         
+
+        proj=get_nearest_projectile(self.player1,self.p2_projectiles);
+        self.projX=-1
+        self.projY=-1
+        if (proj!=None):
+                self.projX,self.projY=get_proj_pos(proj)
+                print("Projectile spawned ",self.projX,self.projY);
+        
+
+    
+
         self.state =[
             self.playerHP,
             self.enemyHP,
@@ -437,7 +461,9 @@ class fighterEnv(Env):
             self.playerRecovery,
             self.enemyRecovery,
             self.playerBlock,
-            self.enemyBlock
+            self.enemyBlock,
+            self.projX,
+            self.projY
         ]
         self.state=np.array(self.state);
         # Set shower length
@@ -495,13 +521,23 @@ class fighterEnv(Env):
             round_info = {'p1': self.path1, 'p2':self.path2, 'winner':winner, 'roundNum':self.roundNum}
             self.round_results_json.write_text(json.dumps(round_info))
         
+
+
+                #Player x
+        #Player y
+        #Enemy x
+        #Enemy y
+        #Player HP
+        #Enemy HP
+
         self.playerHP=get_hp(self.player1)
         self.enemyHP=get_hp(self.player2)
-        # self.p1_projectiles = [proj["projectile"] for proj in self.projectiles if proj["projectile"]._player._id == 1]
-        # self.p2_projectiles = [proj["projectile"] for proj in self.projectiles if proj["projectile"]._player._id == 2]
+    
+        self.p1_projectiles = [proj["projectile"] for proj in self.projectiles if proj["projectile"]._player._id == 1]
+        self.p2_projectiles = [proj["projectile"] for proj in self.projectiles if proj["projectile"]._player._id == 2]
         self.playerX,self.playerY=get_pos(self.player1);
         self.enemyX,self.enemyY=get_pos(self.player2);
-
+        
         self.playerStun=get_stun_duration(self.player1);
         self.enemyStun=get_stun_duration(self.player2);
 
@@ -518,11 +554,19 @@ class fighterEnv(Env):
         self.playerBlock=get_block_status(self.player1);
         self.enemyBlock=get_block_status(self.player2);
         
-
         if (self.enemyHeavy==True):self.enemyHeavy=1;
         else: self.enemyHeavy=0
         if (self.playerHeavy==True):self.playerHeavy=1;
         else: self.playerHeavy=0
+        
+
+        proj=get_nearest_projectile(self.player1,self.p2_projectiles);
+        self.projX=-999
+        self.projY=-999
+        if (proj!=None):
+                self.projX,self.projY=get_proj_pos(proj)
+                print("Projectile spawned ",self.projX,self.projY);
+        
 
         self.state =[
             self.playerHP,
@@ -542,19 +586,30 @@ class fighterEnv(Env):
             self.playerRecovery,
             self.enemyRecovery,
             self.playerBlock,
-            self.enemyBlock
-        ] 
+            self.enemyBlock,
+            self.projX,
+            self.projY
+        ]
         self.state=np.array(self.state);
-        reward+=self.playerHP-prePlayerHealth
-        reward+=self.enemyHP-preEnemyHealth
+        a=(self.playerHP-prePlayerHealth)*2;
+        b=max(0,(preEnemyHealth-self.enemyHP)*2)
+        reward+=a;
+        reward+=b
         
+        self.projectiles
         if (done):
-            if (self.playerHP>self.enemyHP):reward+=100;
-            else: reward-=100;
+            if (self.playerHP>self.enemyHP):reward+=200+self.max_tick-self.tick;
+            elif (self.playerHP<self.enemyHP): reward-=(200+self.max_tick-self.tick);
+        
+        if (a>0):
+            print("Rewarded for healing")
+        elif (a<0):
+            print("Punished for losing health")
+        if (b>0):
+            print("Rewarded for damaging")
 
-        reward-=1;
-        print(self.playerHP)
-        print(self.enemyHP)
+        print("Player HP:",self.playerHP)
+        print("Enemy HP:", self.enemyHP)
         print(realAction);
         return self.state, reward, done, info
 
@@ -613,14 +668,16 @@ class fighterEnv(Env):
             self.max_tick += 1
             
             
+        
+      
         self.playerHP=get_hp(self.player1)
         self.enemyHP=get_hp(self.player2)
     
-        # self.p1_projectiles = [proj["projectile"] for proj in self.projectiles if proj["projectile"]._player._id == 1]
-        # self.p2_projectiles = [proj["projectile"] for proj in self.projectiles if proj["projectile"]._player._id == 2]
+        self.p1_projectiles = [proj["projectile"] for proj in self.projectiles if proj["projectile"]._player._id == 1]
+        self.p2_projectiles = [proj["projectile"] for proj in self.projectiles if proj["projectile"]._player._id == 2]
         self.playerX,self.playerY=get_pos(self.player1);
         self.enemyX,self.enemyY=get_pos(self.player2);
-
+        
         self.playerStun=get_stun_duration(self.player1);
         self.enemyStun=get_stun_duration(self.player2);
 
@@ -630,11 +687,6 @@ class fighterEnv(Env):
         self.enemySecondary=get_secondary_cooldown(self.player2);
         self.playerHeavy=heavy_on_cooldown(self.player1);
         self.enemyHeavy=heavy_on_cooldown(self.player2);
-        if (self.enemyHeavy==True):self.enemyHeavy=1;
-        else: self.enemyHeavy=0
-        if (self.playerHeavy==True):self.playerHeavy=1;
-        else: self.playerHeavy=0
-
 
         self.playerRecovery=get_recovery(self.player1);
         self.enemyRecovery=get_recovery(self.player2);
@@ -642,8 +694,20 @@ class fighterEnv(Env):
         self.playerBlock=get_block_status(self.player1);
         self.enemyBlock=get_block_status(self.player2);
         
-
+        if (self.enemyHeavy==True):self.enemyHeavy=1;
+        else: self.enemyHeavy=0
+        if (self.playerHeavy==True):self.playerHeavy=1;
+        else: self.playerHeavy=0
         
+
+        proj=get_nearest_projectile(self.player1,self.p2_projectiles);
+        self.projX=-999
+        self.projY=-999
+        if (proj!=None):
+                self.projX,self.projY=get_proj_pos(proj)
+                print("Projectile spawned ",self.projX,self.projY);
+        
+
         self.state =[
             self.playerHP,
             self.enemyHP,
@@ -662,8 +726,10 @@ class fighterEnv(Env):
             self.playerRecovery,
             self.enemyRecovery,
             self.playerBlock,
-            self.enemyBlock
-        ] 
+            self.enemyBlock,
+            self.projX,
+            self.projY
+        ]
         self.state=np.array(self.state);
         return self.state,5
 
